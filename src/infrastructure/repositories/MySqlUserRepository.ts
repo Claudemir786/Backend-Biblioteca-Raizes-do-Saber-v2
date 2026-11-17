@@ -4,6 +4,16 @@ import pool from "../database/connection.js";
 import { ResultSetHeader,RowDataPacket } from "mysql2";
 
 
+    type ReadUser = RowDataPacket &{
+        id:number,
+        user_name:string,
+        last_name:string,
+        email:string,
+        password:string,
+        is_admin:boolean,
+        is_employee:boolean,
+        is_active:boolean
+    }
 
 export class MySqlUserRepository implements IUserRepository{
 
@@ -25,13 +35,48 @@ export class MySqlUserRepository implements IUserRepository{
        }
     }
 
-    async login(email: string, password: string): Promise<object> {
-        
-        console.log("buscando usuário na base de dados");
-        return{id:1}
 
+
+    async login(email: string): Promise<User> {
+        
+        try {
+            console.log("Fazendo busca de usuário no banco ....");
+
+            const [result] = await pool.query<ReadUser[]>(`SELECT * FROM users WHERE email = ?`, [email]);
+
+            if(result.length === 0 )throw new Error("Usuário não encontrado");
+            
+            const findedUser = result[0];
+
+            console.log("Usuário encontrado com sucesso!");
+
+            const user = new User(findedUser.id,findedUser.user_name,"",findedUser.email,findedUser.password);
+
+            if(findedUser.is_employee){
+                user.setEmployee(true);
+                return user;
+            }
+            if(findedUser.is_admin){
+                user.setIsAdmin(true);
+                return user;
+            }
+                
+            return user;
+            
+        } catch (error) {
+            console.error("Falha ao encontrar usuário no banco de dados: ", error);
+            return new User(0,"","","","")
+        }
+    }
+     
+    async changeName(id: number, name: string, lastName: string): Promise<null | User> {
+     return null;
+    }
+    async changeEmail(id: number, email: string): Promise<null | User> {
+        return null;
     }
 
+    
 
 
 }

@@ -4,5 +4,9 @@ export interface IUserRepository{
     
     createUser(user:User):Promise<boolean>;
 
-    login(email:string,password:string):Promise<object>;
+    login(email:string):Promise<User>;
+
+    changeName(id:number, name:string, lastName:string):Promise<null | User>;
+
+    changeEmail(id:number, email:string):Promise<null | User>;
 }

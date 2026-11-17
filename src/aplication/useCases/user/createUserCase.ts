@@ -42,7 +42,7 @@ export class CreateUserUseCase{
    
 }
 
-function verifyPasswordEmail(password:string, email:string):boolean{
+ export function verifyPasswordEmail(password:string, email:string):boolean{
     //cria a regra de senha forte com numero,letra Maiuscula e minuscula e caractere especial
     const validPassword =  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
@@ -54,7 +54,7 @@ function verifyPasswordEmail(password:string, email:string):boolean{
         console.log("Senha e e-mail validos para criação")
         return true;
     }else{
-        console.log("Email ou senha não são validos para criação de usuário");
+        console.log("Email ou senha não são validos");
         return false;
     }
 

@@ -60,12 +60,16 @@ export class userController{
             }
             const loginCaseUse = makeLoginUser();
 
-            const result:object = await loginCaseUse.login(email,password);
+            const result:object | null = await loginCaseUse.login(email,password);
 
-            return res.status(200).json({success:true, id:result});
+            if(!result){
+                return res.status(401).json({success:false, message:"usuário não encontrado"})
+            }
+
+            return res.status(200).json({success:true, user:result});
             
         } catch (error) {
-            console.error("Falha ao relaizar o login");
+            console.error("Falha ao relaizar o login: ", error);
             return res.status(400).json({success:false, message:"Usuário não encontrado"});
         }
     }
