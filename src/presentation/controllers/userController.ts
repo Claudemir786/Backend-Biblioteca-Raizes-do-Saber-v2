@@ -4,6 +4,7 @@ import { makeLoginUser } from "../../main/factories/user/makeLoginUser.js";
 import { User } from "../../domain/entities/User.js";
 import { changeNameLastName } from "../../main/factories/user/changeNameLastName.js";
 import { changeEmailFactory } from "../../main/factories/user/changeEmail.js";
+import { makeDeleteUser } from "../../main/factories/user/makeDeleteUser.js";
 
 
 
@@ -121,8 +122,30 @@ export class userController{
     }
 
 
-    async delete(){
+    async delete(req:Request<{},{},{id:number}>, res:Response):Promise<Response>{
+        try {
 
+            const {id} =req.body;
+
+            if(!id){
+                return res.status(401).json({success:true, message:"dados enviados incorretamente"});
+            }
+
+            const useCase = makeDeleteUser();
+
+            const result = useCase.deleteUser(id);
+
+            if(!result)throw new Error("não foi possível deletar usuário");
+
+            return res.status(200).json({success:true, message:"usuário excluído com sucesso"});
+            
+        } catch (error) {
+            console.error("Erro: ", error);
+           return res.status(400).json({success:false, message:"não foi possível dletear usuário"});
+        }
     }
 
+    async searchUser(){
+
+    }
 }

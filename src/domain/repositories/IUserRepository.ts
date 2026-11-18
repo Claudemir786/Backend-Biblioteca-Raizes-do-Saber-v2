@@ -9,4 +9,8 @@ export interface IUserRepository{
     changeName(id:number, name:string, lastName:string):Promise<null | boolean>;
 
     changeEmail(id:number, email:string):Promise<null | boolean>;
+
+    delete(id:number):Promise<boolean>;
+
+    searchUser(name:string):Promise<null | User[]>;
 }

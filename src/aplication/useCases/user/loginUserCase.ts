@@ -47,6 +47,12 @@ export class LoginUserCase{
                 }
             }
 
+            //se a conta estiver desativada
+            if(!user.is_active){
+                console.log("Conta de usuário está inativa");
+                return null;
+            }
+
             //verifica o hash de senha 
            const verifyBryptPassword = await this.passwordHash.comparePasswordHash(password,user.password);
             

@@ -94,7 +94,7 @@ export class MySqlUserRepository implements IUserRepository{
 
             if(rows.affectedRows === 0)throw new Error("Update de email não foi relaizado no banco de dados");
             
-            console.log("Email alterado com sucesso....");
+            console.log("Email alterado com sucesso...."); 
 
             return true;
         
@@ -103,6 +103,46 @@ export class MySqlUserRepository implements IUserRepository{
             return null
        }
        
+    }
+
+    async delete(id: number): Promise<boolean> {
+    
+        try {
+
+            const [result] = await pool.query<ResultSetHeader>(`UPDATE users SET is_active = false WHERE id = ? `,[id] );
+
+            if(result.affectedRows === 0 )throw new Error("Falha ao deixar o usuário inativo no banco de dados");
+
+            console.log(`usuário "deletado" com sucesso!!`);
+            return true;
+            
+        } catch (error) {
+            console.error("Error Banco: ", error);
+            return false;
+        }
+
+    }
+
+    async searchUser(name: string): Promise<null | User[]> {
+        try {
+
+            const [result] = await pool.query<ReadUser[]>(`SELECT FROM users WHERE user_name = ?`, [name]);
+            
+            if(result.length === 0 )throw new Error("Falha ao encontrar usuário com o nome recebido");
+            let userArray:User[] = [];
+
+            result.map(u =>{
+                const user = new User(u.id,u.user_name,u.last_name,u.email,"");
+                userArray.push(user);
+            })
+            
+            console.log("Usuários encontrados: ", userArray);
+            return userArray;
+            
+        } catch (error) {
+            console.error("Erro no banco: ", error);
+            return null;
+        }
     }
 
     
