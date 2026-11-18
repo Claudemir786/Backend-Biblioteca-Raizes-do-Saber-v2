@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { makeCreateUser } from "../../main/factories/user/makeCreateUser.js";
 import { makeLoginUser } from "../../main/factories/user/makeLoginUser.js";
 import { User } from "../../domain/entities/User.js";
+import { changeNameLastName } from "../../main/factories/user/changeNameLastName.js";
+import { changeEmailFactory } from "../../main/factories/user/changeEmail.js";
 
 
 
@@ -74,8 +76,48 @@ export class userController{
         }
     }
 
-    async updateEmail(){
+    async updateNameLastName(req:Request<{},{},{},{name:string,lastName:string}>, res:Response):Promise<Response>{
+        try {
+            console.log("Dados recebidos: ", req.query);
+            const {name,lastName} = req.query;
 
+            if(!name || !lastName){
+                return res.status(401).json({success:false, message:"Dados enviados incorretamente"});
+            }
+            
+            const useCase= changeNameLastName();
+            const result = await useCase.change(name,lastName);
+
+            if(!result)throw new Error("dados não foram alterados");
+
+            return res.status(200).json({success:true, message:"nome e sobre nome alterados com sucesso!"});
+            
+        } catch (error) {
+            console.error("Erro controller: ", error);
+            return res.status(400).json({success:false, message:"não foi possível alterar nome e sobrenome"});
+        }
+
+    }
+
+    async updateEmail(req:Request<{},{},{},{email:string}>, res:Response):Promise<Response>{
+        try {
+
+            const {email}= req.query;
+
+            if(!email)return res.status(401).json({success:false,message:"dados enviados incorretamente"})
+
+            const useCase = changeEmailFactory();
+
+            const result = await useCase.changeEmail(email)
+
+            if(!result)throw new Error("não foi possível alterar o e-mail")
+
+            return res.status(200).json({success:true, message:"Email de usuário alterado com sucesso"});                
+            
+        } catch (error) {
+            console.error("Erro controller: ", error);
+            return res.status(400).json({success:false, message:"Não foi possível alterar email do usuário"});
+        }
     }
 
 

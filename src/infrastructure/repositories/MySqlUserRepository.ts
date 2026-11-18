@@ -1,3 +1,4 @@
+
 import { User } from "../../domain/entities/User.js";
 import { IUserRepository } from "../../domain/repositories/IUserRepository.js";
 import pool from "../database/connection.js";
@@ -69,11 +70,39 @@ export class MySqlUserRepository implements IUserRepository{
         }
     }
      
-    async changeName(id: number, name: string, lastName: string): Promise<null | User> {
-     return null;
+    async changeName(id: number, name: string, lastName: string): Promise<null | boolean> {
+
+       try {
+            const [rows] = await pool.query<ResultSetHeader>(`UPDATE users SET user_name = ?,last_name = ? WHERE id = ?`, [name,lastName,id]);
+
+            if(rows.affectedRows === 0)throw new Error("Update de name e lastName não foi relaizado no banco de dados");
+            
+            console.log("Nome e sobrenome alterados com sucesso....");
+
+            return true;
+
+        
+       } catch (error) {
+            console.error("Erro Banco: ", error);
+            return null
+       }
     }
-    async changeEmail(id: number, email: string): Promise<null | User> {
-        return null;
+
+    async changeEmail(id: number, email: string): Promise<null | boolean> {
+         try {
+            const [rows] = await pool.query<ResultSetHeader>(`UPDATE users SET email = ? WHERE id = ?`, [email,id]);
+
+            if(rows.affectedRows === 0)throw new Error("Update de email não foi relaizado no banco de dados");
+            
+            console.log("Email alterado com sucesso....");
+
+            return true;
+        
+       } catch (error) {
+            console.error("Erro Banco: ", error);
+            return null
+       }
+       
     }
 
     

@@ -6,7 +6,7 @@ export interface IUserRepository{
 
     login(email:string):Promise<User>;
 
-    changeName(id:number, name:string, lastName:string):Promise<null | User>;
+    changeName(id:number, name:string, lastName:string):Promise<null | boolean>;
 
-    changeEmail(id:number, email:string):Promise<null | User>;
+    changeEmail(id:number, email:string):Promise<null | boolean>;
 }

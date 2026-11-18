@@ -10,6 +10,8 @@ const usercontroll = new userController();
 routeUser.get("/", usercontroll.test);
 routeUser.post("/create", usercontroll.create);
 routeUser.post("/login", usercontroll.login);
+routeUser.put("/changeName", usercontroll.updateNameLastName);
+routeUser.put("/changeEmail", usercontroll.updateEmail);
 
 
 export default routeUser;

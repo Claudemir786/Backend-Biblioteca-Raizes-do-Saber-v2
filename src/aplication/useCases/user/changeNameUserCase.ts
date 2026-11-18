@@ -7,14 +7,16 @@ export class ChangeNameUserCase{
         private userRepository:IUserRepository
     ){}
 
-    async change(id:number,newName:string,newLastName:string):Promise<null | User>{
+    async change(newName:string,newLastName:string):Promise<null | boolean>{
         try {
 
+            const resultChangeName = await this.userRepository.changeName(3,newName,newLastName);
+            if(!resultChangeName)throw new Error("nome e sobrenome não foram alterados!");
 
-            return null
+            return true;
 
         } catch (error) {
-            
+            console.error("UseCase Error: ", error);            
             return null
         }
 
