@@ -36,8 +36,6 @@ export class MySqlUserRepository implements IUserRepository{
        }
     }
 
-
-
     async login(email: string): Promise<User> {
         
         try {
@@ -126,7 +124,7 @@ export class MySqlUserRepository implements IUserRepository{
     async searchUser(name: string): Promise<null | User[]> {
         try {
 
-            const [result] = await pool.query<ReadUser[]>(`SELECT FROM users WHERE user_name = ?`, [name]);
+            const [result] = await pool.query<ReadUser[]>(`SELECT * FROM users WHERE user_name = ?`, [name]);
             
             if(result.length === 0 )throw new Error("Falha ao encontrar usuário com o nome recebido");
             let userArray:User[] = [];

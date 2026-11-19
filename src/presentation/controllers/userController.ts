@@ -5,6 +5,7 @@ import { User } from "../../domain/entities/User.js";
 import { changeNameLastName } from "../../main/factories/user/changeNameLastName.js";
 import { changeEmailFactory } from "../../main/factories/user/changeEmail.js";
 import { makeDeleteUser } from "../../main/factories/user/makeDeleteUser.js";
+import { makeSearchUser } from "../../main/factories/user/makeSearchUser.js";
 
 
 
@@ -145,7 +146,27 @@ export class userController{
         }
     }
 
-    async searchUser(){
+    async searchUser(req:Request<{},{},{},{name:string}>, res:Response):Promise<Response>{
+        try {
 
+            const {name} = req.query;
+
+            if(!name){
+                return res.status(401).json({success:false, message:"dados enviados incorretamente"});
+            }
+
+            const userUseCase = makeSearchUser();
+
+            const result = await userUseCase.search(name);
+
+            if(!result)throw new Error("dados não encontrados e retornados para a controller");
+
+            return res.status(200).json({success:true, users:result});
+                
+            
+        } catch (error) {
+            console.error("Erro: ", error);
+            return res.status(400).json({success:false, message:"não foram encontrados dados com base no nome enviado"});
+        }
     }
 }
