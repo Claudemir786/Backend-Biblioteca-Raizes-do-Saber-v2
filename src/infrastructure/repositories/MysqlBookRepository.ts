@@ -1,4 +1,4 @@
-import { RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { Book } from "../../domain/entities/Book.js";
 import { IBookrepository } from "../../domain/repositories/IBookRepository.js";
 import pool from "../database/connection.js";
@@ -8,7 +8,7 @@ type ReadBook = RowDataPacket&{
     title:string,
     author:string,
     page:number,
-    genre:number,
+    genre:string,
     publisher:string,
     quantity:number,
     publication_date:string,
@@ -51,11 +51,60 @@ export class MysqlBookRepositories implements IBookrepository{
     }
 
     async searchByTitle(title: string): Promise<null | Book[]> {
-        return null;
+        try {
+
+            const [result] = await pool.query<ReadBook[]>(`SELECT * FROM books WHERE title = ?`, [title]);
+
+            if(result.length === 0)throw new Error("Livro não encontrado no banco de dados");
+
+
+            let arrayBooks:Book[]  = [];
+
+            //inserindo livros retornados em um novo array;
+            result.map((b)=>{
+                const book = new Book(
+                    b.id,
+                    b.title,
+                    b.author,
+                    b.page,
+                    b.genre,
+                    b.publisher,
+                    b.quantity,
+                    b.publication_date,
+                    b.url_img,
+                    b.isbn
+                );
+
+                arrayBooks.push(book);
+                
+            });
+
+            return arrayBooks;
+            
+        } catch (error) {
+            console.error("Falha ao encontrar livro pelo título: ", error);
+            return null;
+        }
     }
 
     async addBook(book: Book): Promise<boolean> {
-        return false;
+        try {
+
+            const [rows] = await pool.query<ResultSetHeader>(`INSERT INTO books
+                                                              (title,author,page,genre,publisher,quantity,publication_date,url_img,isbn)
+                                                              VALUES(?,?,?,?,?,?,?,?,?)`, 
+                                                            [book.title,book.author,book.page,book.genre,book.publisher,book.quantity,book.publication_date,book.url_img,book.isbn]);
+
+            if(rows.affectedRows === 0)throw new Error("Adição de um novo livro não foi efetuado com sucesso no banco de dados");
+            
+            console.log("Livro adicionado com sucesso");
+
+            return true;
+            
+        } catch (error) {
+            console.error("Falha ao adicionar livro: ", error);
+            return false;
+        }
     }
 
     async deleteBook(idBook: number): Promise<boolean> {

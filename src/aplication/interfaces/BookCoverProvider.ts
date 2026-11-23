@@ -1,6 +1,7 @@
+import { BookApi } from "../../domain/entities/BookAPi.js";
 
 
-export interface BookCoverPrivider{
+export interface BookCoverProvider{
 
-    searchImgByTitle(title:string):Promise<null | string>;
+    searchImgByTitle(title:string):Promise<null | BookApi[]>;
 }

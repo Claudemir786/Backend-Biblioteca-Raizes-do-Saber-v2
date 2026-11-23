@@ -1,16 +1,16 @@
 
 export class Book{
 
-    private id:number;
-    private title:string;
-    private author:string;
-    private page:number;
-    private genre:number;
-    private publisher:string;
-    private quantity:number;
-    private publication_date:string;
-    private url_img:string;
-    private isbn:string;
+    id:number;
+    title:string;
+    author:string;
+    page:number;
+    genre:string;
+    publisher:string;
+    quantity:number;
+    publication_date:string;
+    url_img:string;
+    isbn:string;
    
 
     constructor(
@@ -18,7 +18,7 @@ export class Book{
     title:string,
     author:string,
     page:number,
-    genre:number,
+    genre:string,
     publisher:string,
     quantity:number,
     publication_date:string,
