@@ -3,8 +3,12 @@ import { makeSBookGenre } from "../../main/factories/book/makeSBookGenre.js";
 import makeSearchBookByTitle from "../../main/factories/book/makeSBookTitle.js";
 import { Book } from "../../domain/entities/Book.js";
 import makeCreateBook from "../../main/factories/book/makeCreateBook.js";
+import makeDeleteBook from "../../main/factories/book/makeDeleteBook.js";
+import makeUpdateBook from "../../main/factories/book/makeUpdateBook.js";
+
 
 type PostBook = {
+    id:number;
     title:string;
     author:string;
     page:number;
@@ -81,6 +85,50 @@ export class BookController{
         } catch (error) {
             console.error("Falha ao adicionar novo livro: ", error);
             return res.status(400).json({success:false, message:"Não foi possível adicionar novo livro"});
+        }
+    }
+
+    async deleteBook(req:Request<{},{},{idBook:number}>, res:Response):Promise<Response>{
+        try {
+
+            const{idBook} = req.body;
+
+            if(!idBook)return res.status(401).json({success:false, message:"Dados enviados incorretamente"});
+
+            const useCase = makeDeleteBook();
+            const resultDelete = await useCase.delete(idBook);
+
+            if(!resultDelete)throw new Error("exclusão de livro não foi concluida com sucesso!");
+
+            return res.status(200).json({success:false,message:"Livro excluído com sucesso"});
+            
+        } catch (error) {
+            console.error("Erro: ", error);
+            return res.status(400).json({success:false, message:"não foi possível deletar livro da base de dados"});
+        }
+    }
+
+    async updateBook(req:Request<{},{},Book>, res:Response):Promise<Response>{
+        try {
+           
+            const {id,title,author,page,genre,publisher,quantity,publication_date,url_img,isbn} = req.body;
+            
+            if(!id || !title || !author || !page || !genre || !publisher || !quantity || !publication_date || !url_img || !isbn){
+                return res.status(401).json({success:false, message:"Dados enviados incorretamente"});
+            }
+
+            const bookUpdate = new Book(id,title,author,page,genre,publisher,quantity,publication_date,url_img,isbn)
+
+            const bookUseCase = makeUpdateBook();
+            const resultUpdate = await bookUseCase.update(bookUpdate);
+
+            if(!resultUpdate)throw new Error("Falha ao fazer update de livro");
+            
+            return res.status(200).json({success:true, book:resultUpdate});
+            
+        } catch (error) {
+            console.error("Error: ", error);
+            return res.status(400).json({success:false, message:"Não foi possível realizar alteração de dados do livro"});
         }
     }
 }

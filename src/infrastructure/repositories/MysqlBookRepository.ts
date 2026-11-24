@@ -108,10 +108,64 @@ export class MysqlBookRepositories implements IBookrepository{
     }
 
     async deleteBook(idBook: number): Promise<boolean> {
-        return false;
+        try {
+
+            const [rows] = await pool.query<ResultSetHeader>(`DELETE FROM books WHERE id = ?`, [idBook]);
+
+            if(rows.affectedRows === 0 )throw new Error("Falha ao deletar livro no banco de dados");
+
+            console.log("Livro excluido da base de dados com sucesso!");
+
+            return true;
+            
+        } catch (error) {
+            console.error("Erro: ", error);
+            return false;
+
+        }
     }
 
    async updateBook(book: Book): Promise<null | Book> {
-        return null;
+        try {
+
+            const [rows] = await pool.query<ResultSetHeader>(`UPDATE books 
+                                                              SET 
+                                                                title = ?,
+                                                                author = ?, 
+                                                                page = ?, 
+                                                                genre = ?,
+                                                                publisher = ?, 
+                                                                quantity = ?, 
+                                                                publication_date = ?,
+                                                                url_img = ?,
+                                                                isbn = ?
+                                                              WHERE id = ?`,[book.title,book.author,book.page,book.genre,book.publisher,book.quantity,book.publication_date,book.url_img,book.isbn, book.id]);
+            
+            if(rows.affectedRows === 0 )throw new Error("Naõ foi possível realizar update corretamente no banco de dados");
+            
+            //fazendo pesquisa para retornar o livro que foi alternado
+            const [result] = await pool.query<ReadBook[]>(`SELECT * FROM books WHERE id = ?`, [book.id]);
+
+            if(result.length === 0 )throw new Error("Falha ao buscar dados do livro alterado");
+            
+            const returnBook = new Book(
+                result[0].id,
+                result[0].title,
+                result[0].author,
+                result[0].page,
+                result[0].genre,
+                result[0].publisher,
+                result[0].quantity,
+                result[0].publication_date,
+                result[0].url_img,
+                result[0].isbn
+            );
+
+            return returnBook;
+            
+        } catch (error) {
+            console.error("Erro: ", error);
+            return null;
+        }    
     }
 }
